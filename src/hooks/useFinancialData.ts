@@ -33,7 +33,8 @@ export const useFinancialData = (ticker: string) => {
     refetch: refetchNews
   } = useQuery({
     queryKey: ['stockNews', ticker],
-    queryFn: () => financialApi.getStockNews(ticker),
+    // queryFn: () => financialApi.getStockNews(ticker),
+    queryFn: () => {},
     staleTime: 1000 * 60 * 15, // 15 minutes
     retry: 1
   });
