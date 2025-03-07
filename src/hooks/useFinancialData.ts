@@ -1,8 +1,9 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { financialApi } from '@/services/api';
 import { toast } from '@/hooks/use-toast';
+import useAAuth from './useAuth';
 
 interface StockInfo {
   ticker: string;
@@ -36,6 +37,9 @@ export const useFinancialData = (ticker: string) => {
     staleTime: 1000 * 60 * 15, // 15 minutes
     retry: 1
   });
+  const {auth} = useAAuth();
+  const {username, password} = useMemo(() => auth, [auth]);
+
   
   // Mock stock price data (in a real application, this would come from an API)
   const getStockInfo = (ticker: string): StockInfo => {
@@ -77,9 +81,27 @@ export const useFinancialData = (ticker: string) => {
   }, [ticker]);
   
   // Send a query about the stock
-  const submitQuery = async (query: string) => {
+  const submitQuery = async (message: string): Promise<string> => {
+    if(username && password){
+      try {
+        const {response}  = await financialApi.queryStockAdvice({username, password, message, stock: ticker});
+        return response;
+      } catch (error) {
+        toast({
+          title: 'Query Error',
+          description: 'Failed to get financial advice. Please try again.',
+          variant: 'destructive'
+        });
+        throw error;
+      }
+    }
+    
+  };
+
+  const getStockChart = async (): Promise<any> => {
     try {
-      return await financialApi.queryStockAdvice(query, ticker);
+      const response  = await financialApi.getStockChart(ticker);
+      return response;
     } catch (error) {
       toast({
         title: 'Query Error',
@@ -88,6 +110,7 @@ export const useFinancialData = (ticker: string) => {
       });
       throw error;
     }
+    
   };
   
   return {
@@ -96,6 +119,7 @@ export const useFinancialData = (ticker: string) => {
     isNewsLoading,
     newsError,
     refetchNews,
-    submitQuery
+    submitQuery,
+    getStockChart
   };
 };
