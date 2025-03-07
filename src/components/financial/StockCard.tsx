@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ArrowUpRight, ArrowDownRight, BarChart2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import GlassMorphCard from '@/components/ui-custom/GlassMorphCard';
+import { useFinancialData } from '@/hooks/useFinancialData';
 
 interface StockCardProps {
   ticker: string;
@@ -23,6 +24,7 @@ const StockCard: React.FC<StockCardProps> = ({
   change = 0,
   changePercent = 0
 }) => {
+  const {getStockChart} = useFinancialData(ticker);
   // Get stock color based on ticker
   const getStockColor = () => {
     switch (ticker) {
@@ -55,6 +57,11 @@ const StockCard: React.FC<StockCardProps> = ({
   });
   
   const formattedPercent = `${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}%`;
+
+  useEffect(() => {
+    getStockChart().then(console.log);
+  }
+  , [ticker]);
   
   return (
     <GlassMorphCard

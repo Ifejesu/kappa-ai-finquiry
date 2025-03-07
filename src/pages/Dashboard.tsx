@@ -92,7 +92,7 @@ const Dashboard = () => {
                 <Tabs defaultValue="query" className="w-full">
                   <TabsList className="grid grid-cols-2 mb-4">
                     <TabsTrigger value="query">Ask Financial Questions</TabsTrigger>
-                    <TabsTrigger value="news">Latest News</TabsTrigger>
+                    <TabsTrigger value="news">History</TabsTrigger>
                   </TabsList>
                   
                   <TabsContent value="query" className="space-y-4">

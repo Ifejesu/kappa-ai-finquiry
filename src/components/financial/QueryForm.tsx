@@ -7,6 +7,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { useFinancialData } from '@/hooks/useFinancialData';
 
 // Define the form schema
 const formSchema = z.object({
@@ -33,6 +34,7 @@ const QueryForm: React.FC<QueryFormProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [response, setResponse] = useState<string | null>(null);
+  const {submitQuery} = useFinancialData(selectedStock);
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -47,19 +49,11 @@ const QueryForm: React.FC<QueryFormProps> = ({
     setResponse(null);
     
     try {
-      // Simulate API request
-      await new Promise(resolve => setTimeout(resolve, 1500));
+     const response = await submitQuery(data.prompt);
+      setResponse(response);
       
       // Mock response based on selected stock
-      const stockInfo = stockOptions.find(stock => stock.id === data.stock);
-      
-      setResponse(
-        `Based on the latest market analysis, ${stockInfo?.name || "the selected stock"} 
-        shows promising indicators. Your query about "${data.prompt}" reveals that 
-        market sentiment remains positive, with technical indicators suggesting potential 
-        short-term growth. However, consider macroeconomic factors that could impact 
-        the broader market before making investment decisions.`
-      );
+      // const stockInfo = stockOptions.find(stock => stock.id === data.stock);
       
     } catch (error) {
       console.error('Error fetching response:', error);
@@ -131,7 +125,7 @@ const QueryForm: React.FC<QueryFormProps> = ({
       {response && (
         <div className="bg-secondary/30 p-4 rounded-lg">
           <h3 className="font-medium mb-2">Financial Analysis:</h3>
-          <p className="text-sm">{response}</p>
+          <p className="text-sm" dangerouslySetInnerHTML={{__html: response}}></p>
         </div>
       )}
     </div>

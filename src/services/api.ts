@@ -69,13 +69,26 @@ export const authApi = {
 // Financial data APIs
 export const financialApi = {
   getStockNews: async (ticker: string) => {
-    return fetchWithAuth(`/stock-advise/news?ticker=${ticker}`);
+    try{
+      const response = await fetchWithAuth(`/stock-advise/news?ticker=${ticker}`);
+      return response;
+    }catch(error){
+      console.error('Error fetching stock news:', error);
+    }
+    return "";
   },
   
-  queryStockAdvice: async (query: string, ticker: string) => {
-    return fetchWithAuth('/stock-advise/query', {
+  queryStockAdvice: async ({username,password,message,stock}: {username: string, password:string, message: string, stock: string}) => {
+    return fetchWithAuth('/financial/advice', {
       method: 'POST',
-      body: JSON.stringify({ query, ticker })
+      body: JSON.stringify({ username, password, message, stock })
+    });
+  },
+
+  getStockChart: async (stock: string) => {
+    return fetchWithAuth('/stock-chart', {
+      method: 'POST',
+      body: JSON.stringify({ stock })
     });
   },
   

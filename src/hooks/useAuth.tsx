@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 export interface AuthState {
     id: number,
     username: string;
+    password: string;
     image: string;
 }
 
@@ -28,7 +29,7 @@ function getStoredAuth(): AuthState {
             console.error('Error parsing sessionStorage auth data:', e);
         }
     }
-    return { id: NaN, username: '', image: ''};
+    return { id: NaN, username: '', password: '', image: ''};
 }
 
 export default function useAAuth() {
@@ -41,7 +42,7 @@ export default function useAAuth() {
 
     const login = async (username: string, password: string) => {
         const {response} = await api.login(username, password)
-        const newAuth: AuthState = {id: response.user_id, username, image: response.image };
+        const newAuth: AuthState = {id: response.user_id, username, password, image: response.image };
         setAuth(newAuth);
     };
 
@@ -50,7 +51,7 @@ export default function useAAuth() {
     };
 
     const logout = () => {
-        setAuth({ username: '', id: NaN, image: '' });
+        setAuth({ username: '', id: NaN, password: '', image: '' });
         localStorage.removeItem(STORAGE_KEY);
     };
 
