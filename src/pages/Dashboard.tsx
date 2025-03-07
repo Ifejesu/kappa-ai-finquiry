@@ -20,7 +20,7 @@ const stockOptions = [
   { id: "GOOG", name: "Alphabet", color: "stock-google" }
 ];
 
-const mockNews = [
+let mockNews = [
   {
     id: "1",
     title: "NVIDIA Announces New AI Chips",
@@ -49,6 +49,7 @@ const mockNews = [
     ticker: "GOOG"
   }
 ];
+mockNews = [];
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -122,6 +123,13 @@ const Dashboard = () => {
                   
                   <TabsContent value="news">
                     <div className="space-y-4">
+                      {
+                        mockNews.length === 0 && (
+                          <p className="text-muted-foreground text-center text-sm">
+                            No history available for this stock.
+                          </p>
+                        )
+                      }
                       {mockNews.map(news => (
                         <NewsCard key={news.id} news={news} />
                       ))}

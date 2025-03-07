@@ -91,6 +91,13 @@ export const financialApi = {
       body: JSON.stringify({ stock })
     });
   },
+
+  getStockPrice: async (stock: string) => {
+    return fetchWithAuth('/stock-price', {
+      method: 'POST',
+      body: JSON.stringify({ stock })
+    });
+  },
   
   sendRagQuery: async (query: string, context?: {
     ticker?: string,
@@ -121,3 +128,18 @@ export const mediaApi = {
     });
   }
 };
+
+export interface PriceDataItem {
+  Symbol: string;
+  "Short Name": string;
+  Currency: string;
+  "Market Price": number;
+  "Market Change": number;
+  "Change Percent": string;
+  "Day High": number;
+  "Day Low": number;
+  "Market Volume": number;
+  "Previous Close": number;
+  "Market Cap": number;
+  "Market State": string;
+}
