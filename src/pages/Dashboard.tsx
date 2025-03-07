@@ -11,6 +11,7 @@ import DataFreshnessIndicator from "@/components/financial/DataFreshnessIndicato
 import { VoiceInteraction } from "@/components/voice/VoiceInteraction";
 import VideoResponse from "@/components/voice/VideoResponse";
 import { supabase } from "@/integrations/supabase/client";
+import useAAuth from '@/hooks/useAuth';
 
 // Mock data for initial rendering
 const stockOptions = [
@@ -55,37 +56,14 @@ const Dashboard = () => {
   const [lastFetched, setLastFetched] = useState(new Date());
   const [showVoiceInteraction, setShowVoiceInteraction] = useState(false);
   const [showVideoResponse, setShowVideoResponse] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const {auth, logout} = useAAuth();
+  
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      if(!auth?.id){
         navigate('/auth');
-        return;
       }
-      setUser(session.user);
-    };
-
-    fetchUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        if (!session) {
-          navigate('/auth');
-        } else {
-          setUser(session.user);
-        }
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    // The onAuthStateChange listener will handle the redirect
-  };
+    }, [navigate,auth]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -100,9 +78,9 @@ const Dashboard = () => {
           
           <div className="flex items-center gap-4">
             <p className="text-sm text-muted-foreground hidden md:block">
-              {user?.email}
+              {auth?.username?.toUpperCase()}
             </p>
-            <Button variant="outline" onClick={handleSignOut}>Sign Out</Button>
+            <Button variant="outline" onClick={logout}>Sign Out</Button>
           </div>
         </div>
         

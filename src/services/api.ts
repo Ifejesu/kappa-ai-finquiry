@@ -2,7 +2,7 @@
 import { toast } from "@/hooks/use-toast";
 
 // Base API URL - would be replaced with actual backend URL in production
-const API_BASE_URL = 'https://api.kappafinai.example/v1';
+const API_BASE_URL = 'http://127.0.0.1:8000';
 
 // Helper for making authenticated requests
 const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
@@ -10,7 +10,7 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
   
   const headers = {
     'Content-Type': 'application/json',
-    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+    // ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
     ...(options.headers || {})
   };
   
@@ -22,7 +22,7 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `Request failed with status ${response.status}`);
+      throw new Error(errorData.detail || errorData.message || `Request failed with status ${response.status}`);
     }
     
     return await response.json();
@@ -39,17 +39,25 @@ const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
 
 // Authentication APIs
 export const authApi = {
-  login: async (email: string, password: string) => {
+  login: async (username: string, password: string) => {
+    const formData = new URLSearchParams();
+    formData.append("username", username);
+    formData.append("password", password);
+
     return fetchWithAuth('/login', {
       method: 'POST',
-      body: JSON.stringify({ email, password })
+      body: formData.toString(),
+      headers: {
+        'accept': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
     });
   },
   
-  register: async (email: string, password: string, name: string) => {
+  register: async (username: string, password: string, first_name: string, last_name: string, image:string="") => {
     return fetchWithAuth('/register', {
       method: 'POST',
-      body: JSON.stringify({ email, password, name })
+      body: JSON.stringify({ username, password, first_name, last_name, image })
     });
   },
   

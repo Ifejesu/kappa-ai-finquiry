@@ -8,52 +8,39 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import useAAuth from '@/hooks/useAuth';
 
 const Auth = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [firstname, setFirstname] = useState('');
+  const [lastname, setLastname] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  
+  const {login, signup, auth} = useAAuth();
+
   useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate('/dashboard');
-      }
-    };
-    
-    checkSession();
-    
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        if (session) {
-          navigate('/dashboard');
-        }
-      }
-    );
-    
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+    if(auth?.id){
+      navigate('/dashboard');
+    }
+  }, [navigate,auth]);
   
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !password) {
-      toast.error('Please enter both email and password');
+    if (!username || !password || !firstname || !lastname) {
+      toast.error('Please fill in all fields');
       return;
     }
     
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signUp({ 
-        email, 
-        password,
-      });
-      
-      if (error) throw error;
-      
-      toast.success('Registration successful! Check your email for verification.');
+      await signup(username, password, firstname, lastname, "");
+      toast.success('Registration successful! Login to continue');
+      setFirstname('');
+      setLastname('');
+      setUsername('');
+      setPassword('');
     } catch (error: any) {
       toast.error(error.message || 'An error occurred during sign up');
     } finally {
@@ -64,21 +51,14 @@ const Auth = () => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !password) {
+    if (!username || !password) {
       toast.error('Please enter both email and password');
       return;
     }
     
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signInWithPassword({ 
-        email, 
-        password,
-      });
-      
-      if (error) throw error;
-      
-      // Redirect handled by the onAuthStateChange listener
+      await login(username, password);
     } catch (error: any) {
       toast.error(error.message || 'Failed to sign in');
     } finally {
@@ -104,13 +84,13 @@ const Auth = () => {
             <form onSubmit={handleSignIn}>
               <CardContent className="space-y-4 pt-6">
                 <div className="space-y-2">
-                  <Label htmlFor="signin-email">Email</Label>
+                  <Label htmlFor="signin-email">Username</Label>
                   <Input 
                     id="signin-email"
-                    type="email" 
-                    placeholder="your@email.com" 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    type="text" 
+                    placeholder="Username" 
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     required
                   />
                 </div>
@@ -141,14 +121,36 @@ const Auth = () => {
           <TabsContent value="signup">
             <form onSubmit={handleSignUp}>
               <CardContent className="space-y-4 pt-6">
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
+              <div className="space-y-2">
+                  <Label htmlFor="signin-fname">Firstname</Label>
                   <Input 
-                    id="signup-email"
-                    type="email" 
-                    placeholder="your@email.com" 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    id="signin-fname"
+                    type="text" 
+                    placeholder="Firstname" 
+                    value={firstname}
+                    onChange={(e) => setFirstname(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="signin-lname">Lastname</Label>
+                  <Input 
+                    id="signin-lname"
+                    type="text" 
+                    placeholder="Lastname" 
+                    value={lastname}
+                    onChange={(e) => setLastname(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="signin-email">Username</Label>
+                  <Input 
+                    id="signin-email"
+                    type="text" 
+                    placeholder="Username" 
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     required
                   />
                 </div>
