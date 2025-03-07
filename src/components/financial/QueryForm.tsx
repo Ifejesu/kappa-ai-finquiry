@@ -34,7 +34,7 @@ const QueryForm: React.FC<QueryFormProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [response, setResponse] = useState<string | null>(null);
-  const {submitQuery} = useFinancialData(selectedStock);
+  const {submitQuery, getStockChart} = useFinancialData(selectedStock);
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),

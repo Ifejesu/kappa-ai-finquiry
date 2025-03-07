@@ -1,7 +1,7 @@
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { financialApi } from '@/services/api';
+import { financialApi, PriceDataItem } from '@/services/api';
 import { toast } from '@/hooks/use-toast';
 import useAAuth from './useAuth';
 
@@ -81,7 +81,7 @@ export const useFinancialData = (ticker: string) => {
   }, [ticker]);
   
   // Send a query about the stock
-  const submitQuery = async (message: string): Promise<string> => {
+  const submitQuery = useCallback(async (message: string): Promise<string> => {
     if(username && password){
       try {
         const {response}  = await financialApi.queryStockAdvice({username, password, message, stock: ticker});
@@ -96,12 +96,12 @@ export const useFinancialData = (ticker: string) => {
       }
     }
     
-  };
+  }, [username, password, ticker]);
 
-  const getStockChart = async (): Promise<any> => {
+  const getStockChart = useCallback(async (): Promise<string> => {
     try {
-      const response  = await financialApi.getStockChart(ticker);
-      return response;
+      const {image}  = await financialApi.getStockChart(ticker);
+      return image;
     } catch (error) {
       toast({
         title: 'Query Error',
@@ -111,7 +111,22 @@ export const useFinancialData = (ticker: string) => {
       throw error;
     }
     
-  };
+  }, [ticker]);
+
+  const getStockPrice = useCallback(async (): Promise<PriceDataItem[]> => {
+    try {
+      const {price_data}  = await financialApi.getStockPrice(ticker);
+      return price_data;
+    } catch (error) {
+      toast({
+        title: 'Query Error',
+        description: 'Failed to get financial advice. Please try again.',
+        variant: 'destructive'
+      });
+      throw error;
+    }
+    
+  }, [ticker]);
   
   return {
     stockInfo,
@@ -120,6 +135,7 @@ export const useFinancialData = (ticker: string) => {
     newsError,
     refetchNews,
     submitQuery,
-    getStockChart
+    getStockChart,
+    getStockPrice
   };
 };
