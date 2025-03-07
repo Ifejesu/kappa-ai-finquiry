@@ -2,7 +2,7 @@
 import { toast } from "@/hooks/use-toast";
 
 // Base API URL - would be replaced with actual backend URL in production
-const API_BASE_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = 'https://kappa-ai-fin.onrender.com';
 
 // Helper for making authenticated requests
 const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
