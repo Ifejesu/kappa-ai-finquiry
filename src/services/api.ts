@@ -57,7 +57,6 @@ export const authApi = {
   register: async (username: string, password: string, first_name: string, last_name: string, image: string = "") => {
     return fetchWithAuth('/register', {
       method: 'POST',
-      mode: "cors",
       body: JSON.stringify({ username, password, first_name, last_name, image })
     });
   },
